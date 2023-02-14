@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".GalleryActivity">
+
+    <LinearLayout
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <Button
+        android:id="@+id/bt_prev"
+        android:layout_marginHorizontal="20dp"
+        android:text="PREV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/bt_next"
+        android:text="NEXT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <!-- 우리가 만든 클래스가 xml에서 사용될 수 있었던 결정적인 이유?
+    View를 상속받았기 때문-->
+    <com.example.app20230214.GalleryView
+        android:id="@+id/galleryView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </com.example.app20230214.GalleryView>
+
+</LinearLayout>
