@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ListActivity"
+    android:orientation="vertical">
+
+    <Button
+        android:id="@+id/bt_regist"
+        android:layout_gravity="right"
+        android:text="글쓰기"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+   <!--
+    ListView는 말 그대로 리스트 전용 뷰로서, 상당히 많은 기능이 들어있다
+    사용이유 : 게시물이 많아지면 메모리 효율성을 처리할 수 있다
+     + 자체적으로 스크롤 뷰 탑재
+   -->
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+    </ListView>
+</LinearLayout>
