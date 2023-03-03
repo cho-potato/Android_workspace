@@ -1,15 +1,7 @@
 package com.example.a20230302photoapp;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.icu.text.Edits;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -17,7 +9,15 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -26,7 +26,9 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = this.getClass().getName();
 
     ActivityResultLauncher launcher; // 권한 요청 객체
-
+    File selectedFile; // 서버에 전송할 사진 및 미리보기할 사진
+    PhotoView photoView;
+    UploadManager uploadManager = new UploadManager();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,12 +36,23 @@ public class MainActivity extends AppCompatActivity {
 
         Button bt_internal=findViewById(R.id.bt_internal);
         Button bt_external=findViewById(R.id.bt_external);
+        Button bt_regist=findViewById(R.id.bt_external);
+
+        photoView=findViewById(R.id.photoView);
 
         bt_internal.setOnClickListener((v)->{
             openInternal();
         });
         bt_external.setOnClickListener((v)->{
             openExternal();
+        });
+        bt_regist.setOnClickListener((v)->{
+           Thread thread = new Thread(){
+               public void run() {
+                   upload();
+               }
+           };
+           thread.start();
         });
 
         // 안드로이드의 새로운 권한 정책으로 인해 앱의 시작과 동시에 사용자로부터 권한에 대한 확인 및 수락을 받는다
@@ -89,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         if(checkVersion()) {
             // 최신 핸드폰이므로 파일에 대한 접근보다는 사용자로부터 허락을 먼저 받는다
             if(checkGranted()) {
-                openExternal();
+                // openExternal();
             } else {
                 // 권한 요청을 시도( 사용자에게는 권한 수락에 대한 팝업이 보이게 된다 )
                 launcher.launch(new String[] {
@@ -98,12 +111,24 @@ public class MainActivity extends AppCompatActivity {
                         Manifest.permission.WRITE_EXTERNAL_STORAGE
                 });
             }
-
         } else {
             // 구버전이므로 허락이고뭐고 필요없이 접근가능하다
         }
+    }
+    public void upload() {
+        Product product = new Product();
+        product.setCategory_idx(1);
+        product.setProduct_name("지노");
+        product.setBrand("지노지노");
+        product.setPrice(250000);
+        product.setDiscount(190000);
+        product.setDetail("민지노");
 
-
+        try {
+            uploadManager.regist(product, selectedFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     public boolean checkVersion() {
         // 마시멜로우 폰부터 새로운 정책을 적용해야 하므로 현재 사용자의 폰이 어떤 버전인지 파악
@@ -158,6 +183,21 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "하위 디렉토리 및 파일 수는 "+files.length);
         for( File file : files) {
             Log.d(TAG, file.getName());
+        }
+        // 안드로이드의 카메라 앱이 사용 중인 DCIM 디렉토리 안의 카메라 디렉토리 안의 첫번째 이미지 접근해보기
+        File dcim = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+        File[] dcimSub= dcim.listFiles(); // DCIM 디렉토리의 하위 디렉토리를 반환
+        for(File sub : dcimSub) {
+            Log.d(TAG, "DCIM 디렉토리의 하위 디렉토리 명은 "+sub.getName());
+            if(sub.getName().equals("Camera")) {
+                // 이 안에 들어 있는 사진 중 0번째 사진을 강제 선택하여 미리보기 해줌
+                File[] pics = sub.listFiles(); // 카메라 디렉토리의 모든 파일 배열로 반환
+                selectedFile = pics[0];
+                // 포토뷰가 가진.createBitmap();
+                photoView.createBitmap();
+                photoView.invalidate(); // onDraw() 호출 : 다시 그려라
+                // preview();
+            }
         }
     }
 }
